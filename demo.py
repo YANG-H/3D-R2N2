@@ -34,23 +34,40 @@ def download_model(fn):
               '--create-dirs', '-o', fn])
 
 
-def load_demo_images():
+def load_input_images(d):
     ims = []
-    for i in range(3):
-        im = Image.open('imgs/%d.png' % i)
-        ims.append([np.array(im).transpose(
-            (2, 0, 1)).astype(np.float32) / 255.])
+    for fname in os.listdir(d):
+        fullname = os.path.join(d, fname)
+        try:
+            im = Image.open(fullname)
+            im = im.resize((127, 127), resample=Image.ANTIALIAS)
+            npy = np.array(im)
+            print(npy.shape)
+            if npy.shape[2] == 4:
+                print('rgba->rgb')
+                r, g, b, a = np.rollaxis(npy, axis=-1)
+                r[a < 10] = 255
+                g[a < 10] = 255
+                b[a < 10] = 255
+                npy = np.dstack([r, g, b])
+            npy = npy.transpose((2, 0, 1)).astype(np.float32) / 255.
+            ims.append([npy])
+        except OSError:
+            pass 
     return np.array(ims)
 
 
 def main():
     '''Main demo function'''
+    input_dir = sys.argv[1] if len(sys.argv) > 1 else './input/chair1'
+
     # Save prediction into a file named 'prediction.obj' or the given argument
-    pred_file_name = sys.argv[1] if len(sys.argv) > 1 else 'prediction.obj'
-    pred_txt_file_name = sys.argv[2] if len(sys.argv) > 2 else 'prediction.txt'
+    pred_file_name = sys.argv[2] if len(sys.argv) > 2 else 'prediction.obj'
+    pred_txt_file_name = sys.argv[3] if len(sys.argv) > 3 else 'prediction.txt'
 
     # load images
-    demo_imgs = load_demo_images()
+    demo_imgs = load_input_images(input_dir)
+    print(demo_imgs.shape)
 
     # Download and load pretrained weights
     download_model(DEFAULT_WEIGHTS)
