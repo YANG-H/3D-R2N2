@@ -57,3 +57,13 @@ def write_obj(filename, verts, faces):
 def voxel2obj(filename, pred):
     verts, faces = voxel2mesh(pred)
     write_obj(filename, verts, faces)
+
+
+def voxel2text(filename, pred):
+    with open(filename, 'w') as f:
+        l, m, n = pred.shape
+        f.write('{} {} {}\n'.format(l, m, n))
+        for i in range(l):
+            for j in range(m):
+                for k in range(n):
+                    f.write('{}\n'.format(pred[i, j, k]))

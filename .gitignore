@@ -10,3 +10,8 @@ wiki/
 
 # Results
 output/
+
+
+.vscode
+prediction.obj
+prediction.txt

@@ -17,7 +17,7 @@ from PIL import Image
 from models import load_model
 from lib.config import cfg, cfg_from_list
 from lib.solver import Solver
-from lib.voxel import voxel2obj
+from lib.voxel import voxel2obj, voxel2text
 
 DEFAULT_WEIGHTS = 'output/ResidualGRUNet/default_model/weights.npy'
 
@@ -47,6 +47,7 @@ def main():
     '''Main demo function'''
     # Save prediction into a file named 'prediction.obj' or the given argument
     pred_file_name = sys.argv[1] if len(sys.argv) > 1 else 'prediction.obj'
+    pred_txt_file_name = sys.argv[2] if len(sys.argv) > 2 else 'prediction.txt'
 
     # load images
     demo_imgs = load_demo_images()
@@ -67,6 +68,8 @@ def main():
 
     # Save the prediction to an OBJ file (mesh file).
     voxel2obj(pred_file_name, voxel_prediction[0, :, 1, :, :] > cfg.TEST.VOXEL_THRESH)
+    voxel2text(pred_txt_file_name, voxel_prediction[0, :, 1, :, :])
+
 
     # Use meshlab or other mesh viewers to visualize the prediction.
     # For Ubuntu>=14.04, you can install meshlab using
