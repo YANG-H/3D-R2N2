@@ -34,11 +34,14 @@ def download_model(fn):
               '--create-dirs', '-o', fn])
 
 
-def load_input_images(d):
+def load_input_images(d, maxn=0):
     ims = []
     for fname in os.listdir(d):
+        if maxn > 0 and len(ims) >= maxn:
+            break
         fullname = os.path.join(d, fname)
         try:
+            print(fullname)
             im = Image.open(fullname)
             im = im.resize((127, 127), resample=Image.ANTIALIAS)
             npy = np.array(im)
@@ -60,13 +63,14 @@ def load_input_images(d):
 def main():
     '''Main demo function'''
     input_dir = sys.argv[1] if len(sys.argv) > 1 else './input/chair1'
+    input_num = int(sys.argv[2]) if len(sys.argv) > 2 else 0
 
     # Save prediction into a file named 'prediction.obj' or the given argument
-    pred_file_name = sys.argv[2] if len(sys.argv) > 2 else 'prediction.obj'
-    pred_txt_file_name = sys.argv[3] if len(sys.argv) > 3 else 'prediction.txt'
+    pred_file_name = sys.argv[3] if len(sys.argv) > 3 else 'prediction.obj'
+    pred_txt_file_name = sys.argv[4] if len(sys.argv) > 4 else 'prediction.txt'
 
     # load images
-    demo_imgs = load_input_images(input_dir)
+    demo_imgs = load_input_images(input_dir, input_num)
     print(demo_imgs.shape)
 
     # Download and load pretrained weights
